@@ -6,7 +6,7 @@ defmodule WordsWithEnemies.Letters do
   """
 
   import Enum, only: [random: 1, take_random: 2]
-  import WordsWithEnemies.WordList, only: [words: 0, using: 2]
+  import WordsWithEnemies.WordFinder, only: [words: 0, using: 2]
 
   @pairs [
     {"t", "h"}, {"h", "e"}, {"a", "n"}, {"r", "e"}, {"o", "n"},

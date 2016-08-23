@@ -1,4 +1,4 @@
-defmodule WordsWithEnemies.WordList do
+defmodule WordsWithEnemies.WordFinder do
   alias WordsWithEnemies.Letters
 
   @wordlist "priv/static/sowpods.txt"
@@ -135,10 +135,10 @@ defmodule WordsWithEnemies.WordList do
 
   ## Examples
 
-    iex> WordList.similarity "pineapple", "apple"
+    iex> WordFinder.similarity "pineapple", "apple"
     1
 
-    iex> WordList.similarity "cozy", "fullers"
+    iex> WordFinder.similarity "cozy", "fullers"
     0
   """
   def similar_to(words, compare_word, min_similarity) do
@@ -162,10 +162,10 @@ defmodule WordsWithEnemies.WordList do
 
   ## Examples
 
-      iex> WordList.compare "pineapple", "planet"
+      iex> WordFinder.compare "pineapple", "planet"
       {["i", "p", "p", "e"], ["t"]}
 
-      iex> WordList.compare "pineapple", "apple"
+      iex> WordFinder.compare "pineapple", "apple"
       {["p", "i", "n", "e"], []}
   """
   def compare_words(a, b)

@@ -1,7 +1,7 @@
 defmodule WordsWithEnemies.GameChannel do
   use WordsWithEnemies.Web, :channel
-  import WordsWithEnemies.WordList, only: [words: 0, using: 2]
-  alias WordsWithEnemies.{Letters, WordList, GameRegistry, GameServer}
+  import WordsWithEnemies.WordFinder, only: [words: 0, using: 2]
+  alias WordsWithEnemies.{Letters, WordFinder, GameRegistry, GameServer}
 
   def join("games:ai", _payload, socket) do
     {:ok, socket}
@@ -44,7 +44,7 @@ defmodule WordsWithEnemies.GameChannel do
   end
 
   def handle_in("games:check_validity", %{"word" => word}, socket) do
-    valid? = word |> WordList.valid?
+    valid? = word |> WordFinder.valid?
     {:reply, {:ok, %{valid: valid?}}, socket}
   end
 

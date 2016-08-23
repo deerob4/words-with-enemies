@@ -11,7 +11,7 @@ defmodule WordsWithEnemies do
       supervisor(WordsWithEnemies.Endpoint, []),
       supervisor(WordsWithEnemies.Presence, []),
       worker(WordsWithEnemies.GameRegistry, []),
-      worker(WordsWithEnemies.WordList, [])
+      worker(WordsWithEnemies.WordFinder, [])
       # Here you could define other workers and supervisors as children
       # worker(WordsWithEnemies.Worker, [arg1, arg2, arg3]),
     ]
