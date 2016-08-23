@@ -1,0 +1,6 @@
+duration:1.0;mem stats:false;sys mem stats:false
+module;test;tags;iterations;elapsed
+FindWordsBench	few words		1	1126046
+FindWordsBench	many words		1	1098637
+FindWordsBench	medium words		1	1102450
+FindWordsBench	possible?		1000000	2090707

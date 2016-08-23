@@ -1,0 +1,18 @@
+.lobby {
+  animation: rotation 6s infinite linear;
+}
+
+.title {
+  font-size: 3.5em;
+  text-align: center;
+  margin-bottom: 0;
+}
+
+@keyframes rotation {
+  25% {
+    transform: rotate(-2deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}

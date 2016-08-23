@@ -1,0 +1,49 @@
+// Channel actions
+export const CREATE_SOCKET = 'CREATE_SOCKET';
+export const CONNECT_TO_LOBBY = 'CONNECT_TO_LOBBY';
+export const LEAVE_LOBBY = 'LEAVE_LOBBY';
+export const CONNECT_TO_GAME = 'CONNECT_TO_GAME';
+export const LEAVE_GAME = 'LEAVE_GAME';
+
+// Menu navigation actions
+export const SHOW_DIFFICULTY_BUTTONS = 'SHOW_DIFFICULTY_BUTTONS';
+export const SHOW_INSTRUCTIONS = 'SHOW_INSTRUCTIONS';
+export const SHOW_MENU = 'SHOW_MENU';
+export const SHOW_LOBBY = 'SHOW_LOBBY';
+
+// Lobby actions
+export const JOIN_GAME = 'JOIN_GAME';
+export const FETCH_AVAILABLE_GAMES = 'FETCH_AVAILABLE_GAMES';
+export const RECEIVE_JOINABLE_GAME = 'RECEIVE_JOINABLE_GAME';
+export const REMOVE_JOINABLE_GAME = 'REMOVE_JOINABLE_GAME';
+export const HOST_GAME = 'HOST_GAME';
+export const HOST_GAME_FAILURE = 'HOST_GAME_FAILURE';
+export const CANCEL_HOSTING = 'CANCEL_HOSTING';
+export const INITIALISE_PRESENCE_STATE = 'INITIALISE_PRESENCE_STATE';
+export const RECEIVE_PRESENCE_DIFF = 'RECEIVE_PRESENCE_DIFF';
+
+// General game stuff
+export const SET_DIFFICULTY = 'SET_DIFFICULTY';
+export const GENERATE_INITIAL_COLOURS = 'GENERATE_INITIAL_COLOURS';
+export const CHANGE_COLOURS = 'CHANGE_COLOURS';
+
+// Player management
+export const ADD_PLAYER = 'ADD_PLAYER';
+export const SET_OPPONENT_NAME = 'SET_OPPONENT_NAME';
+export const INCREMENT_OPPONENT_SCORE = 'INCREMENT_OPPONENT_SCORE';
+export const ADD_LETTER_TO_OPPONENT_WORD = 'ADD_LETTER_TO_OPPONENT_WORD';
+export const REMOVE_LETTER_FROM_OPPONENT_WORD = 'REMOVE_LETTER_FROM_OPPONENT_WORD';
+export const SET_OPPONENT_WORD = 'SET_OPPONENT_WORD';
+export const INCREMENT_SCORE = 'INCREMENT_SCORE';
+
+// Letter actions
+export const MOVE_LETTER_TO_WORD = 'MOVE_LETTER_TO_WORD';
+export const MOVE_LETTER_TO_BANK = 'MOVE_LETTER_TO_BANK';
+export const RECEIVE_INITIAL_LETTERS = 'RECEIVE_INITIAL_LETTERS';
+export const CHANGE_LETTERS = 'CHANGE_LETTERS';
+export const ADD_LETTER = 'ADD_LETTER';
+
+// Difficulty constants
+export const EASY = 'easy';
+export const MEDIUM = 'medium';
+export const HARD = 'hard';

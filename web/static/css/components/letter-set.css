@@ -1,0 +1,33 @@
+.letterset {
+  font-family: Dosis, sans-serif;
+  font-size: 2.7em;
+  font-weight: 600;
+}
+
+.well {
+  composes: letterset;
+  text-align: center;
+  padding-top: 10px;
+  width: 100%;
+  height: 174px;
+  border: 4px solid;
+  border-radius: 4px;
+  padding-left: 34px;
+  padding-top: 53px;
+  box-sizing: border-box;
+  margin-bottom: 35px;
+  -webkit-animation: rotation 6s infinite linear;
+}
+
+.bank {
+  composes: letterset;
+}
+
+@-webkit-keyframes rotation {
+  25% {
+    -webkit-transform: rotate(-2deg);
+  }
+  75% {
+    -webkit-transform: rotate(2deg);
+  }
+}

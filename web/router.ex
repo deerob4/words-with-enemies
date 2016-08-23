@@ -17,10 +17,14 @@ defmodule WordsWithEnemies.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+    get "/lobby", PageController, :redirect_to_menu
+    get "/game", PageController, :redirect_to_menu
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", WordsWithEnemies do
-  #   pipe_through :api
-  # end
+  scope "/api", WordsWithEnemies do
+    pipe_through :api
+
+    get "/find-words", WordController, :index
+    get "/user-id", PageController, :user_id
+  end
 end

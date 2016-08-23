@@ -1,0 +1,32 @@
+.username-picker {
+  margin: 0 auto;
+  width: 250px;
+  margin-bottom: 45px;
+}
+
+.username-message {
+  text-align: center;
+}
+
+.username-input {
+  font-family: Dosis, sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+
+  text-align: center;
+
+  width: 100%;
+
+  border-top: none;
+  border-right: none;
+  border-left: none;
+  border-bottom: 3px solid;
+
+  padding-bottom: 10px;
+
+  outline: none;
+};
+
+.begin-hosting-button {
+  margin-left: 65px;
+}

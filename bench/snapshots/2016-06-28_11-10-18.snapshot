@@ -1,0 +1,4 @@
+duration:1.0;mem stats:false;sys mem stats:false
+module;test;tags;iterations;elapsed
+FindWordsBench	file		1	2193334
+FindWordsBench	stream		1	2172461

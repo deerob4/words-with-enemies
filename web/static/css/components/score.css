@@ -1,0 +1,16 @@
+.score {
+  font-family: Dosis, sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.player {
+  composes: score;
+  float: left;
+}
+
+.opponent {
+  composes: score;
+  float: right;
+}

@@ -1,0 +1,27 @@
+.game-list {
+  list-style-type: none;
+  overflow-y: auto;
+  max-height: 445px;
+  display: inline-block;
+  margin: 0;
+}
+
+.game {
+  width: 400px;
+  margin-bottom: 10px;
+}
+
+.message {
+  margin: 0 0 15px 0;
+  text-align: center;
+}
+
+.buttons {
+  margin: 0 auto;
+}
+
+.no-game-message {
+  text-align: center;
+  line-height: 1.4;
+  margin-bottom: 48px;
+}

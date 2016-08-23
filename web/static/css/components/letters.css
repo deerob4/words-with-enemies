@@ -1,0 +1,81 @@
+.letter {
+  font-family: Dosis, sans-serif;
+  font-size: 45px;
+  font-weight: 500;
+
+  text-transform: uppercase;
+  text-align: center;
+
+  list-style-type: none;
+
+  width: 45px;
+  padding: 10px 7px;
+
+  border: 3px solid;
+  border-radius: 4px;
+
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+
+  transition: all 0.2s ease-in-out;
+}
+
+.letter:hover {
+  transform: scale(1.1) !important
+}
+
+.letter:active {
+  transform: scale(0.7) !important
+}
+
+ul {
+  padding: 0;
+  display: inline;
+}
+
+.letterset {
+  font-family: Dosis, sans-serif;
+  font-size: 2.7em;
+  font-weight: 600;
+}
+
+.letterset .letter {
+  margin-right: 13px;
+}
+
+.letterset .letter:last-child {
+  margin-right: 0;
+}
+
+.well {
+  composes: letterset;
+  width: 100%;
+  height: 174px;
+  border: 4px solid;
+  border-radius: 4px;
+  padding-left: 34px;
+  padding-top: 43px;
+  box-sizing: border-box;
+  margin-bottom: 35px;
+  -webkit-animation: rotation 6s infinite linear;
+}
+
+.empty-well {
+  composes: well;
+  text-align: center;
+  padding-top: 53px;
+}
+
+.bank {
+  composes: letterset;
+}
+
+@-webkit-keyframes rotation {
+  25% {
+    -webkit-transform: rotate(-2deg);
+  }
+  75% {
+    -webkit-transform: rotate(2deg);
+  }
+}

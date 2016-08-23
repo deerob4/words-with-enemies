@@ -1,0 +1,8 @@
+duration:1.0;mem stats:false;sys mem stats:false
+module;test;tags;iterations;elapsed
+Lists	append		500000	2486674
+Lists	concat		500000	3668999
+Lists	listception		500000	2783514
+Lists	wee		1000000000	9289373
+Lists	wow		1000000000	9809509
+Lists	wowee		1000000000	9337136

@@ -1,0 +1,5 @@
+duration:1.0;mem stats:false;sys mem stats:false
+module;test;tags;iterations;elapsed
+Lists	append		500000	2407128
+Lists	concat		500000	3444856
+Lists	listception		500000	2715873

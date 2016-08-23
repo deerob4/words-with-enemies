@@ -1,0 +1,27 @@
+.heading {
+  font-size: 4.3em; /* 70px */
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.subheading {
+  font-weight: 600; /* 30px */
+  margin-top: 0;
+  font-size: 1.75em;
+  text-align: center;
+}
+
+.lobby {
+  animation: rotation 6s infinite linear;
+}
+
+@keyframes rotation {
+  25% {
+    transform: rotate(-2deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}

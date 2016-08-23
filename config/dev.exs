@@ -11,13 +11,16 @@ config :words_with_enemies, WordsWithEnemies.Endpoint,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
-  watchers: []
+  watchers: [
+    {Path.expand("webpack.dev.js"),
+    [cd: Path.expand("../", __DIR__)]}
+  ]
 
 # Watch static and templates for browser reloading.
 config :words_with_enemies, WordsWithEnemies.Endpoint,
   live_reload: [
     patterns: [
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
+      # ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{web/views/.*(ex)$},
       ~r{web/templates/.*(eex)$}

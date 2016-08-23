@@ -1,0 +1,12 @@
+.lobby {
+  margin-left: 20px;
+}
+
+.game {
+  margin-top: 90px;
+  margin-bottom: 15px;
+}
+
+:global .hidden {
+  display: none;
+}

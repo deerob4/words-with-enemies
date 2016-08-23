@@ -2,7 +2,8 @@ defmodule WordsWithEnemies.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "rooms:*", WordsWithEnemies.RoomChannel
+  channel "games:*", WordsWithEnemies.GameChannel
+  channel "games:lobby", WordsWithEnemies.LobbyChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -19,8 +20,8 @@ defmodule WordsWithEnemies.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket) do
-    {:ok, socket}
+  def connect(%{"user_id" => user_id}, socket) do
+    {:ok, assign(socket, :user_id, user_id)}
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

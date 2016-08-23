@@ -8,28 +8,38 @@
     <meta name="author" content="">
 
     <title>Hello WordsWithEnemies!</title>
-    <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
+    <link href='//cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css' rel='stylesheet'>
+    <link href='//fonts.googleapis.com/css?family=Dosis:400,500,600,700,800' rel='stylesheet'>
+
+    <style>
+      html, body, #root, main, #app {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      @media only screen
+      and (min-device-width : 768px)
+      and (max-device-width : 1024px)  {
+        html {
+          font-size: 0.85em
+        }
+      }
+    </style>
   </head>
 
   <body>
-    <div class="container">
-      <header class="header">
-        <nav role="navigation">
-          <ul class="nav nav-pills pull-right">
-            <li><a href="http://www.phoenixframework.org/docs">Get Started</a></li>
-          </ul>
-        </nav>
-        <span class="logo"></span>
-      </header>
+    <main role="main">
+      <%= render @view_module, @view_template, assigns %>
+    </main>
 
-      <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-      <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+    <audio loop autoplay src="<%= static_path(@conn, "/sand_castles.mp3") %>"></audio>
 
-      <main role="main">
-        <%= render @view_module, @view_template, assigns %>
-      </main>
-
-    </div> <!-- /container -->
-    <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
+    <%= if Mix.env == :dev do %>
+      <script src='http://localhost:4001/index.js'></script>
+    <% else %>
+      <script src="<%= static_path(@conn, "/js/index.js") %>"></script>
+    <% end %>
   </body>
 </html>
