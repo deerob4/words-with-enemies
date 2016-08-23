@@ -30,6 +30,7 @@ defmodule WordsWithEnemies.WordFinder do
   @doc """
   Returns all words in the word list.
   """
+  @spec words :: list
   def words do
     Agent.get(__MODULE__, &(&1))
   end
@@ -37,6 +38,9 @@ defmodule WordsWithEnemies.WordFinder do
   @doc """
   Returns a stream of `words` that can be made from `letters`.
   """
+  @spec using(Enumerable.t, list) :: Enumerable.t
+  @spec using(Enumerable.t, String.t) :: Enumerable.t
+
   def using(words, letters) when is_list(letters) do
     words |> Stream.filter(&possible?(&1, letters))
   end
@@ -64,6 +68,7 @@ defmodule WordsWithEnemies.WordFinder do
   Returns a stream of `words` that are between `min`
   and `max` characters in length.
   """
+  @spec between(Enumerable.t, list) :: Enumerable.t
   def between(words, [min: min]) do
     words |> Stream.filter(&min_length?(&1, min))
   end
@@ -90,6 +95,7 @@ defmodule WordsWithEnemies.WordFinder do
   the amount they should appear in the word. For example,
   `%{a: 4, k: 2}` will return all words with exactly 4 a's and 2 k's.
   """
+  @spec containing(Enumerable.t, map, list) :: Enumerable.t
   def containing(words, constraints, opts \\ []) do
     opts = Keyword.put_new(opts, :precise, true)
     words |> Stream.filter(&contains?(&1, constraints, opts))
@@ -130,6 +136,7 @@ defmodule WordsWithEnemies.WordFinder do
   @doc """
   Returns a stream of `words` that begin with `prefix`.
   """
+  @spec starting_with(Enumerable.t, String.t | [String.t]) :: Enumerable.t
   def starting_with(words, prefix) do
     words |> Stream.filter(&String.starts_with?(&1, prefix))
   end
@@ -137,11 +144,13 @@ defmodule WordsWithEnemies.WordFinder do
   @doc """
   Returns a stream of `words` that begin with `suffix`.
   """
+  @spec ending_with(Enumerable.t, String.t | [String.t]) :: Enumerable.t
   def ending_with(words, suffix) do
     words |> Stream.filter(&String.ends_with?(&1, suffix))
   end
 
   @doc "Returns `true` if `word` is valid."
+  @spec valid?(String.t) :: boolean
   def valid?(word), do: word in words
 
   @doc """
@@ -157,12 +166,14 @@ defmodule WordsWithEnemies.WordFinder do
     iex> WordFinder.similarity "cozy", "fullers"
     0
   """
+  @spec similar_to(Enumerable.t, String.t, integer) :: Enumerable.t
   def similar_to(words, compare_word, min_similarity) do
     Stream.filter(words, fn word ->
       similarity(word, compare_word) >= min_similarity
     end)
   end
 
+  @spec similarity(String.t, String.t) :: integer
   def similarity(a, b) do
     a
     |> compare_words(b)
@@ -184,8 +195,10 @@ defmodule WordsWithEnemies.WordFinder do
       iex> WordFinder.compare "pineapple", "apple"
       {["p", "i", "n", "e"], []}
   """
-  def compare_words(a, b)
-  when is_bitstring(a) and is_bitstring(b) do
+  @spec compare_words(String.t, String.t) :: {String.t, String.t}
+  @spec compare_words(list, list) :: {String.t, String.t}
+
+  def compare_words(a, b) when is_bitstring(a) and is_bitstring(b) do
     a = a |> String.codepoints
     b = b |> String.codepoints
     compare_words(a, b)
