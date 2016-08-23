@@ -1,4 +1,20 @@
 defmodule WordsWithEnemies.WordFinder do
+  @moduledoc """
+  Uses the Stream API to efficiently search a wordlist
+  for words based on certain criteria. Each function takes
+  and returns a stream, allowing for easy chaining. When the
+  chain is complete, a function in the `Enum` module must be
+  used to retrieve the words. For example:
+
+      words
+      |> using("peiaewneolafdqe")
+      |> between(min: 8, max: 12)
+      |> starting_with("p")
+      |> Enum.take(1)
+
+      ["palinode"]
+  """
+
   alias WordsWithEnemies.Letters
 
   @wordlist "priv/static/sowpods.txt"
