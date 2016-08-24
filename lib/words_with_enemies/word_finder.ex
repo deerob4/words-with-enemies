@@ -19,10 +19,15 @@ defmodule WordsWithEnemies.WordFinder do
 
   @wordlist "priv/static/sowpods.txt"
 
+  @doc """
+  Transforms the wordlist into a list, and stores
+  it in an agent for efficient access later on.
+  """
   def start_link do
-    words = @wordlist
-            |> File.read!
-            |> String.split("\n", trim: true)
+    words =
+      @wordlist
+      |> File.read!
+      |> String.split("\n", trim: true)
 
     Agent.start_link(fn -> words end, name: __MODULE__)
   end
@@ -31,9 +36,7 @@ defmodule WordsWithEnemies.WordFinder do
   Returns all words in the word list.
   """
   @spec words :: list
-  def words do
-    Agent.get(__MODULE__, &(&1))
-  end
+  def words, do: Agent.get(__MODULE__, &(&1))
 
   @doc """
   Returns a stream of `words` that can be made from `letters`.
