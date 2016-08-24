@@ -37,6 +37,7 @@ defmodule WordsWithEnemies.Mixfile do
      {:gettext, "~> 0.9"},
      {:cowboy, "~> 1.0"},
      {:benchfella, "~> 0.3.0"},
-     {:httpotion, "~> 3.0.0"}]
+     {:httpotion, "~> 3.0.0"},
+     {:credo, "~> 0.4", only: [:dev, :test]}]
   end
 end
