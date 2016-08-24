@@ -24,15 +24,12 @@ defmodule WordsWithEnemies.Letters do
   @doc """
   Generates a list of letters based on the difficulty.
   """
+  @spec generate_set(String.t) :: list
   def generate_set(difficulty) do
     letters = generate_player_set(difficulty)
-
-    words? =
-      words
-      |> using(letters)
-      |> Enum.take(1)
   end
 
+  @spec generate_player_set(String.t) :: list
   def generate_player_set("easy") do
     frequencies(%{high: 5, med: 4, low: 2, pairs: 2}) # 20
   end
@@ -43,6 +40,7 @@ defmodule WordsWithEnemies.Letters do
     frequencies(%{high: 3, med: 3, low: 4, pairs: 1}) # 8
   end
 
+  @spec generate_ai_set(String.t) :: list
   def generate_ai_set("easy") do
     frequencies(%{high: 3, med: 5, low: 4, pairs: 0}) # 12
   end
@@ -72,6 +70,7 @@ defmodule WordsWithEnemies.Letters do
   Appends a new letter to `letters`, based on the frequency
   of letters currently in the list.
   """
+  @spec add_letter(list) :: String.t
   def add_letter(letters) do
     case prevailing_freq(letters) do
       :high -> random(@low_freq)
@@ -102,6 +101,7 @@ defmodule WordsWithEnemies.Letters do
   Returns the most common item in `list`, or `nil` if
   there isn't one.
   """
+  @spec most_common(list) :: any
   def most_common([n]), do: n
   def most_common(list) do
     list
@@ -117,6 +117,9 @@ defmodule WordsWithEnemies.Letters do
   Constructs a map containing each item in `list`,
   and the number of times each one appears.
   """
+  @spec frequency_table(String.t) :: map
+  @spec frequency_table(list) :: map
+
   def frequency_table(string)
   when is_bitstring(string), do: string |> String.codepoints |> frequency_table
 
