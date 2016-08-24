@@ -6,6 +6,8 @@
 /node_modules
 # Generate on crash by the VM
 erl_crash.dump
+/priv/static/js
+/priv/static/css
 
 # The config/prod.secret.exs file by default contains sensitive
 # data and you should not commit it into version control.

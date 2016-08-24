@@ -1,6 +1,7 @@
 defmodule WordsWithEnemies.WordAi do
   use GenServer
   alias WordsWithEnemies.{Letters}
+  import WordsWithEnemies.WordFinder
 
   # Client
 
