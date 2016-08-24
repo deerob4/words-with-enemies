@@ -6,13 +6,13 @@ defmodule WordsWithEnemies.WordFinder do
   chain is complete, a function in the `Enum` module must be
   used to retrieve the words. For example:
 
-      words
-      |> using("peiaewneolafdqe")
+      word_list
+      |> using("oeznltfkqeihydctv")
       |> between(min: 8, max: 12)
-      |> starting_with("p")
+      |> starting_with("h")
       |> Enum.take(1)
 
-      ["palinode"]
+      ["helideck"]
   """
 
   alias WordsWithEnemies.Letters
@@ -35,8 +35,8 @@ defmodule WordsWithEnemies.WordFinder do
   @doc """
   Returns all words in the word list.
   """
-  @spec words :: list
-  def words, do: Agent.get(__MODULE__, &(&1))
+  @spec word_list :: list
+  def word_list, do: Agent.get(__MODULE__, &(&1))
 
   @doc """
   Returns a stream of `words` that can be made from `letters`.
