@@ -10,26 +10,25 @@ defmodule WordsWithEnemies.Hints do
   import WordsWithEnemies.WordFinder
   import WordsWithEnemies.Endpoint, only: [broadcast!: 3]
 
+  @doc """
+  Broadcasts the definitions of up to ten words
+  that can be made using `letters`.
+  """
   def from_letters(letters, opts \\ []) do
     min = Keyword.get(opts, :min, 4)
     max = Keyword.get(opts, :max, 15)
 
-    remove_failures = fn
-      {_word, {:ok, _definition, _part}} -> true
-      {_word, {:error, _reason}} -> false
-    end
-
-    build_map = fn {word, {:ok, definition, part}} ->
-      %{word: word, definition: definition, part: part}
-    end
-
     hints =
-      word_list
+      word_list()
       |> using(letters)
       |> between(min: min, max: max)
       |> Enum.take_random(10)
-      |> Stream.map(fn word -> {word, define(word)} end)
-      |> Stream.filter_map(&remove_failures.(&1), &build_map.(&1))
+      |> Stream.map(&define/1)
+      |> Stream.filter(fn
+        {:ok, definition} -> true
+        {:error, _reason} -> false
+      end)
+      |> Stream.map(fn {:ok, definition} -> definition end)
       |> Enum.to_list
 
     broadcast!("games:ai", "receive_hint", %{hints: hints})
@@ -53,8 +52,8 @@ defmodule WordsWithEnemies.Hints do
     end
   end
 
-  defp extract_definition(%{"results" => [%{"definition" => definition, "partOfSpeech" => part} | _]}) do
-    {:ok, definition, part}
+  defp extract_definition(%{"word" => word, "results" => [%{"definition" => definition, "partOfSpeech" => part} | _]}) do
+    {:ok, %{word: word, definition: definition, part: part}}
   end
   defp extract_definition(_no_definition) do
     {:error, :no_definition}
