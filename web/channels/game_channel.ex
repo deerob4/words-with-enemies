@@ -17,14 +17,14 @@ defmodule WordsWithEnemies.GameChannel do
   @doc """
   Connect to an available multiplayer game from the lobby.
   """
-  def join("games" <> game_id, %{"opponent" => %{"id" => id, "name" => name}}, socket) do
+  def join("games" <> game_id, %{"opponent" => %{"id" => _id, "name" => _name}}, socket) do
     {:ok, assign(socket, :game_id, game_id)}
   end
 
   @doc """
   Create a new multiplayer game and connect to it.
   """
-  def join("games" <> game_id, %{"host" => %{"id" => id, "name" => name} = params}, socket) do
+  def join("games" <> game_id, %{"host" => %{"id" => _id, "name" => _name} = params}, socket) do
     send(self(), {:create_game, params})
     {:ok, assign(socket, :game_id, game_id)}
   end
@@ -43,17 +43,17 @@ defmodule WordsWithEnemies.GameChannel do
     {:reply, {:ok, %{letters: letters}}, socket}
   end
 
-  defp get_hints_and_letters(difficulty) do
+  def get_hints_and_letters(difficulty) do
+    main_pid = self() # keep reference for spawned function.
     letters = Letters.generate_set(:player, difficulty)
-    get_hints(letters, difficulty)
+    # Get the hints in another process so we don't block everything else.
+    spawn(fn -> get_hints(main_pid, letters, difficulty) end)
     letters
   end
 
-  defp get_hints(letters, difficulty) do
-    self = self() # keep reference for spawned function.
+  defp get_hints(main_pid, letters, difficulty) when is_pid(main_pid) do
     opts = hint_strength(difficulty)
-    # Get the hints in another process so we don't block everything else.
-    spawn(fn -> send(self, {:send_hints, Hints.from_letters(letters, opts)}) end)
+    send(main_pid, {:send_hints, Hints.from_letters(letters, opts)})
   end
 
   defp hint_strength("easy"), do: [min: 5]
@@ -102,6 +102,7 @@ defmodule WordsWithEnemies.GameChannel do
     if valid_move?(letter_id, socket) do
       broadcast_from(socket, "letter_to_word", %{letter_id: letter_id})
     end
+
     {:reply, :ok, socket}
   end
 
