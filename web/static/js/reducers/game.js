@@ -21,7 +21,21 @@ const difficulty = (state = '', action) => {
   }
 };
 
+const hints = (state = [], action) => {
+  switch (action.type) {
+    case constants.RECEIVE_HINTS:
+      return action.payload;
+
+    case constants.CHANGE_LETTERS:
+      return [];
+
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   round,
+  hints,
   difficulty
 });

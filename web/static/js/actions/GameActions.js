@@ -14,6 +14,13 @@ const GameActions = {
           payload: channel
         });
       });
+
+      channel.on('receive_hint', (r) => {
+        dispatch({
+          type: constants.RECEIVE_HINTS,
+          payload: r.hints
+        });
+      });
     };
   },
 
@@ -70,23 +77,22 @@ const GameActions = {
         .receive('ok', r => {
           dispatch({
             type: constants.CHANGE_LETTERS,
-            payload: {
-              letters: r.letters
-            }
+            payload: r
           });
         });
     };
   },
 
-  getHint(channel) {
+  getHint() {
     return (dispatch, getState) => {
-      let state = getState();
-      let letters = state.player.bank.map(i => state.letters[i]);
+      const hints = getState().game.hints;
 
-      channel.push('games:get_hint', { letters })
-        .receive('ok', r => {
-          console.log(r.hint);
-        });
+      if (hints.length) {
+        const word = hints[Math.floor(Math.random()*hints.length)];
+        console.log(`${word.part}: ${word.definition} (${word.word})`);
+      } else {
+        console.log('Hints aren\'t available yet - try and work it out yourself!');
+      }
     };
   },
 

@@ -19,7 +19,7 @@ defmodule WordsWithEnemies.Mixfile do
   def application do
     [mod: {WordsWithEnemies, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html,
-                    :cowboy, :logger, :gettext, :httpotion]]
+                    :cowboy, :logger, :gettext, :httpoison]]
   end
 
   # Specifies which paths to compile per environment.
@@ -37,7 +37,7 @@ defmodule WordsWithEnemies.Mixfile do
      {:gettext, "~> 0.9"},
      {:cowboy, "~> 1.0"},
      {:benchfella, "~> 0.3.0"},
-     {:httpotion, "~> 3.0.0"},
+     {:httpoison, "~> 0.10.0"},
      {:credo, "~> 0.4", only: [:dev, :test]}]
   end
 end

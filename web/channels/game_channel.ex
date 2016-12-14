@@ -1,7 +1,7 @@
 defmodule WordsWithEnemies.GameChannel do
   use WordsWithEnemies.Web, :channel
-  import WordsWithEnemies.WordFinder, only: [words: 0, using: 2]
-  alias WordsWithEnemies.{Letters, WordFinder, GameRegistry, GameServer}
+  import WordsWithEnemies.WordFinder, only: [word_list: 0, using: 2]
+  alias WordsWithEnemies.{Letters, WordFinder, GameRegistry, GameServer, Hints}
 
   def join("games:ai", _payload, socket) do
     {:ok, socket}
@@ -29,8 +29,9 @@ defmodule WordsWithEnemies.GameChannel do
   # end
 
   def handle_in("games:start", %{"difficulty" => difficulty}, socket) do
-    letters = Letters.generate_player_set(difficulty)
-    {:reply, {:ok, %{letters: letters}}, socket}
+    letters = Letters.generate_set(:player, difficulty)
+    spawn(fn -> Hints.from_letters(letters, hint_strength(difficulty)) end)
+    {:reply, {:ok, %{letters: letters, hints: []}}, socket}
   end
 
   def handle_in("games:add_letter", %{"letters" => letters}, socket) do
@@ -39,8 +40,9 @@ defmodule WordsWithEnemies.GameChannel do
   end
 
   def handle_in("games:change_letters", %{"difficulty" => difficulty}, socket) do
-    letters = Letters.generate_player_set(difficulty)
-    {:reply, {:ok, %{letters: letters}}, socket}
+    letters = Letters.generate_set(:player, difficulty)
+    spawn(fn -> Hints.from_letters(letters, hint_strength(difficulty)) end)
+    {:reply, {:ok, %{letters: letters, hints: []}}, socket}
   end
 
   def handle_in("games:check_validity", %{"word" => word}, socket) do
@@ -48,8 +50,12 @@ defmodule WordsWithEnemies.GameChannel do
     {:reply, {:ok, %{valid: valid?}}, socket}
   end
 
+  def handle_in("games:get_hint", %{"letters" => letters}, socket) do
+    # hint =
+  end
+
   def handle_in("games:get_words", %{"letters" => letters}, socket) do
-    w = words
+    w = word_list()
         |> using(letters)
         |> Enum.to_list
         |> sort_by_length
@@ -61,7 +67,6 @@ defmodule WordsWithEnemies.GameChannel do
     if valid_move?(letter_id, socket) do
       broadcast_from socket, "letter_to_word", %{letter_id: letter_id}
     end
-
     {:reply, :ok, socket}
   end
 
@@ -82,4 +87,8 @@ defmodule WordsWithEnemies.GameChannel do
     with true <- GameServer.valid_letter?(pid, letter_id),
     do: true
   end
+
+  defp hint_strength("easy"), do: [min: 5]
+  defp hint_strength("medium"), do: [min: 4, max: 8]
+  defp hint_strength("hard"), do: [min: 3, max: 5]
 end
