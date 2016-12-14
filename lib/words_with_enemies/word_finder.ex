@@ -45,7 +45,7 @@ defmodule WordsWithEnemies.WordFinder do
   @spec using(Enumerable.t, String.t) :: Enumerable.t
 
   def using(words, letters) when is_list(letters) do
-    words |> Stream.filter(&possible?(&1, letters))
+    Stream.filter(words, &possible?(&1, letters))
   end
   def using(words, letters) when is_bitstring(letters) do
     using(words, String.codepoints(letters))
@@ -73,13 +73,13 @@ defmodule WordsWithEnemies.WordFinder do
   """
   @spec between(Enumerable.t, list) :: Enumerable.t
   def between(words, [min: min]) do
-    words |> Stream.filter(&min_length?(&1, min))
+    Stream.filter(words, &min_length?(&1, min))
   end
   def between(words, [max: max]) do
-    words |> Stream.filter(&max_length?(&1, max))
+    Stream.filter(words, &max_length?(&1, max))
   end
   def between(words, [min: min, max: max]) do
-    words |> Stream.filter(&length_between?(&1, min, max))
+    Stream.filter(words, &length_between?(&1, min, max))
   end
 
   defp min_length?(word, min) do
@@ -101,7 +101,7 @@ defmodule WordsWithEnemies.WordFinder do
   @spec containing(Enumerable.t, map, list) :: Enumerable.t
   def containing(words, constraints, opts \\ []) do
     opts = Keyword.put_new(opts, :precise, true)
-    words |> Stream.filter(&contains?(&1, constraints, opts))
+    Stream.filter(words, &contains?(&1, constraints, opts))
   end
 
   defp contains?(word, constraints, [precise: precise]) do
@@ -127,7 +127,9 @@ defmodule WordsWithEnemies.WordFinder do
   end
 
   defp has_keys?(checking, keys) do
-    keys |> Map.keys |> Enum.all?(&(&1 in Map.keys(checking)))
+    keys
+    |> Map.keys
+    |> Enum.all?(&(&1 in Map.keys(checking)))
   end
 
   defp atom_keys_to_string(map) do
@@ -141,7 +143,7 @@ defmodule WordsWithEnemies.WordFinder do
   """
   @spec starting_with(Enumerable.t, String.t | [String.t]) :: Enumerable.t
   def starting_with(words, prefix) do
-    words |> Stream.filter(&String.starts_with?(&1, prefix))
+    Stream.filter(words, &String.starts_with?(&1, prefix))
   end
 
   @doc """
@@ -149,7 +151,7 @@ defmodule WordsWithEnemies.WordFinder do
   """
   @spec ending_with(Enumerable.t, String.t | [String.t]) :: Enumerable.t
   def ending_with(words, suffix) do
-    words |> Stream.filter(&String.ends_with?(&1, suffix))
+    Stream.filter(words, &String.ends_with?(&1, suffix))
   end
 
   @doc "Returns `true` if `word` is valid."
@@ -202,8 +204,8 @@ defmodule WordsWithEnemies.WordFinder do
   @spec compare_words(list, list) :: {String.t, String.t}
 
   def compare_words(a, b) when is_bitstring(a) and is_bitstring(b) do
-    a = a |> String.codepoints
-    b = b |> String.codepoints
+    a = String.codepoints(a)
+    b = String.codepoints(b)
     compare_words(a, b)
   end
   def compare_words(word_a, word_b) do
@@ -213,8 +215,8 @@ defmodule WordsWithEnemies.WordFinder do
   defp do_compare_words([], word_a, word_b), do: {word_a, word_b}
   defp do_compare_words([current|others], word_a, word_b) do
     if current in word_a and current in word_b do
-      word_a = word_a |> List.delete(current)
-      word_b = word_b |> List.delete(current)
+      word_a = List.delete(word_a, current)
+      word_b = List.delete(word_b, current)
       do_compare_words(others, word_a, word_b)
     else
       do_compare_words(others, word_a, word_b)
