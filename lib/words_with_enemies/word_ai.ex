@@ -25,7 +25,6 @@ defmodule WordsWithEnemies.WordAi do
   """
   def set_difficulty(pid, difficulty) do
     GenServer.cast(pid, {:set_difficulty, difficulty})
-    IO.puts "red green"
   end
 
   @doc """
@@ -56,7 +55,7 @@ defmodule WordsWithEnemies.WordAi do
   # Server
 
   def init(state) do
-    letters = Letters.generate_ai_set(state.difficulty)
+    letters = Letters.generate_set(:ai, state.difficulty)
     state = Map.put(state, :letters, letters)
     {:ok, state}
   end
@@ -64,9 +63,11 @@ defmodule WordsWithEnemies.WordAi do
   def handle_call(:get_difficulty, _from, state) do
     {:reply, state.difficulty, state}
   end
+
   def handle_call(:get_letters, _from, state) do
     {:reply, state.letters, state}
   end
+
   def handle_call({:make_word, user_word}, _from, state) do
     inspect(user_word)
     word = 10
@@ -81,30 +82,34 @@ defmodule WordsWithEnemies.WordAi do
     new_letters = state.letters |> Letters.add_letter
     {:noreply, %{state | letters: new_letters}}
   end
+
   def handle_cast({:set_difficulty, difficulty}, state) do
     {:noreply, %{state | difficulty: difficulty}}
   end
+
   def handle_cast(:new_letters, state) do
-    new_letters = Letters.generate_ai_set(state.difficulty)
+    new_letters = Letters.generate_set(:ai, state.difficulty)
     {:noreply, %{state | letters: new_letters}}
   end
 
   # Private
 
   def find_words("easy" = difficulty, letters, user_word) do
-    words
+    word_list
     |> using(letters)
     |> between(min: 5, max: 6)
   end
+
   def find_words("medium" = difficulty, letters, user_word) do
-    words
+    word_list
     |> using(letters)
     |> between(min: 7, max: 8)
     |> starting_with(user_word |> Letters.most_common)
   end
+
   def find_words("hard" = difficulty, letters, user_word) do
     prevailing_letter = user_word |> Letters.most_common
-    words
+    word_list
     |> using(letters)
     |> between(min: 8)
     |> starting_with(prevailing_letter)

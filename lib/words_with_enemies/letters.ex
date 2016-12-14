@@ -6,7 +6,7 @@ defmodule WordsWithEnemies.Letters do
   """
 
   import Enum, only: [random: 1, take_random: 2]
-  import WordsWithEnemies.WordFinder, only: [words: 0, using: 2]
+  import WordsWithEnemies.WordFinder, only: [word_list: 0, using: 2]
 
   @pairs [
     {"t", "h"}, {"h", "e"}, {"a", "n"}, {"r", "e"}, {"o", "n"},
@@ -24,33 +24,27 @@ defmodule WordsWithEnemies.Letters do
   @doc """
   Generates a list of letters based on the difficulty.
   """
-  @spec generate_set(String.t) :: list
-  def generate_set(difficulty) do
-    letters = generate_player_set(difficulty)
-  end
-
-  @spec generate_player_set(String.t) :: list
-  def generate_player_set("easy") do
+  @spec generate_set(:player | :ai, String.t) :: list
+  def generate_set(:player, "easy") do
     frequencies(%{high: 5, med: 4, low: 2, pairs: 2}) # 20
   end
-  def generate_player_set("medium") do
+  def generate_set(:player, "medium") do
     frequencies(%{high: 5, med: 4, low: 4, pairs: 2}) # 15
   end
-  def generate_player_set("hard") do
+  def generate_set(:player, "hard") do
     frequencies(%{high: 3, med: 3, low: 4, pairs: 1}) # 8
   end
-
-  @spec generate_ai_set(String.t) :: list
-  def generate_ai_set("easy") do
+  def generate_set(:ai, "easy") do
     frequencies(%{high: 3, med: 5, low: 4, pairs: 0}) # 12
   end
-  def generate_ai_set("medium") do
+  def generate_set(:ai, "medium") do
     frequencies(%{high: 5, med: 4, low: 4, pairs: 1}) # 15
   end
-  def generate_ai_set("hard") do
+  def generate_set(:ai, "hard") do
     frequencies(%{high: 7, med: 6, low: 5, pairs: 2}) # 22
   end
 
+  @spec frequencies(map) :: [String.t]
   defp frequencies(%{high: h, med: m, low: l, pairs: p}) do
     highs = @high_freq |> take_random(h)
     meds = @med_freq |> take_random(m)
@@ -60,6 +54,7 @@ defmodule WordsWithEnemies.Letters do
     Enum.shuffle(highs ++ meds ++ lows ++ pairs)
   end
 
+  @spec get_pairs([{String.t , String.t}]) :: [String.t]
   defp get_pairs(pairs) do
     pairs
     |> Enum.map(&Tuple.to_list/1)
@@ -73,18 +68,20 @@ defmodule WordsWithEnemies.Letters do
   @spec add_letter(list) :: String.t
   def add_letter(letters) do
     case prevailing_freq(letters) do
-      :high -> random(@low_freq)
-      :med  -> random(@low_freq)
-      :low  -> random(@high_freq)
+      :high -> letters ++ random(@low_freq)
+      :med  -> letters ++ random(@low_freq)
+      :low  -> letters ++ random(@high_freq)
     end
   end
 
+  @spec prevailing_freq([String.t]) :: integer
   defp prevailing_freq(letters) do
     freqs = %{high: count_highs(letters),
               med: count_meds(letters),
               low: count_lows(letters)}
 
-    freqs |> Enum.max |> elem(0)
+    {freq, _count} = Enum.max(freqs)
+    freq
   end
 
   defp count_highs(letters) do
@@ -120,12 +117,16 @@ defmodule WordsWithEnemies.Letters do
   @spec frequency_table(String.t) :: map
   @spec frequency_table(list) :: map
 
-  def frequency_table(string)
-  when is_bitstring(string), do: string |> String.codepoints |> frequency_table
-
+  def frequency_table(string) when is_bitstring(string) do
+    string
+    |> String.codepoints
+    |> frequency_table
+  end
   def frequency_table(list) when is_list(list) do
     Enum.reduce(list, %{}, fn (item, freqs) ->
       Map.update(freqs, item, 1, &(&1 + 1))
     end)
   end
 end
+
+['cauliflower', 'smoked streaky bacon', 'chestnut mushrooms', 'milk', 'double cream']

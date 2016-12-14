@@ -154,7 +154,7 @@ defmodule WordsWithEnemies.WordFinder do
 
   @doc "Returns `true` if `word` is valid."
   @spec valid?(String.t) :: boolean
-  def valid?(word), do: word in words
+  def valid?(word), do: word in word_list()
 
   @doc """
   Returns the similarity value of two words as a value
