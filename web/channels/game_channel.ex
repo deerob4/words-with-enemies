@@ -43,6 +43,12 @@ defmodule WordsWithEnemies.GameChannel do
     {:reply, {:ok, %{letters: letters}}, socket}
   end
 
+  def handle_in("games:new_hints", %{"difficulty" => difficulty, "letters" => letters}, socket) do
+    main_pid = self()
+    spawn(fn -> get_hints(main_pid, letters, difficulty) end)
+    {:reply, :ok, socket}
+  end
+
   def get_hints_and_letters(difficulty) do
     main_pid = self() # keep reference for spawned function.
     letters = Letters.generate_set(:player, difficulty)

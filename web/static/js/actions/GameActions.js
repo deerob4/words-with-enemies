@@ -83,7 +83,7 @@ const GameActions = {
     };
   },
 
-  getHint() {
+  getHint(channel) {
     return (dispatch, getState) => {
       const hints = getState().game.hints;
 
@@ -93,6 +93,12 @@ const GameActions = {
           type: constants.GET_HINT,
           payload: hint
         });
+
+        if (hints.length === 3) {
+          let difficulty = getState().game.difficulty;
+          let letters = Object.values(getState().letters);
+          channel.push('games:new_hints', { difficulty, letters });
+        }
       } else {
         dispatch({
           type: constants.HINTS_NOT_AVAILABlE,
