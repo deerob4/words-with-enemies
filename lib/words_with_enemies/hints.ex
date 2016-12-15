@@ -11,27 +11,24 @@ defmodule WordsWithEnemies.Hints do
   import WordsWithEnemies.Endpoint, only: [broadcast!: 3]
 
   @doc """
-  Broadcasts the definitions of up to ten words
+  Returns the definitions of up to ten words
   that can be made using `letters`.
   """
   def from_letters(letters, opts \\ []) do
     min = Keyword.get(opts, :min, 4)
     max = Keyword.get(opts, :max, 15)
 
-    hints =
-      word_list()
-      |> using(letters)
-      |> between(min: min, max: max)
-      |> Enum.take_random(10)
-      |> Stream.map(&define/1)
-      |> Stream.filter(fn
-        {:ok, definition} -> true
-        {:error, _reason} -> false
-      end)
-      |> Stream.map(fn {:ok, definition} -> definition end)
-      |> Enum.to_list
-
-    broadcast!("games:ai", "receive_hint", %{hints: hints})
+    word_list()
+    |> using(letters)
+    |> between(min: min, max: max)
+    |> Enum.take_random(10)
+    |> Stream.map(&define/1)
+    |> Stream.filter(fn
+         {:ok, definition} -> true
+         {:error, _reason} -> false
+       end)
+    |> Stream.map(fn({:ok, definition}) -> definition end)
+    |> Enum.to_list
   end
 
   defp define(word) do
