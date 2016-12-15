@@ -6,6 +6,7 @@ import LetterSet from 'components/LetterSet';
 import FlexContainer from 'components/FlexContainer';
 import GameButtons from 'components/GameButtons';
 import Divider from 'components/Divider';
+import Message from 'components/Message';
 
 import setNounOwnership from 'utils/setNounOwnership';
 import GameActions from 'actions/GameActions';
@@ -29,6 +30,8 @@ class Game extends Component {
       <FlexContainer innerClass="game-container">
         <div className="animated bounceInLeft">
           <InfoBar />
+
+          <Message message={game.message} colour={props.colours.interface.secondary} />
 
           <LetterSet
             type="well"

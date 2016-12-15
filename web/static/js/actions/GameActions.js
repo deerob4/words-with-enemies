@@ -15,7 +15,7 @@ const GameActions = {
         });
       });
 
-      channel.on('receive_hint', (r) => {
+      channel.on('receive_hints', (r) => {
         dispatch({
           type: constants.RECEIVE_HINTS,
           payload: r.hints
@@ -88,10 +88,15 @@ const GameActions = {
       const hints = getState().game.hints;
 
       if (hints.length) {
-        const word = hints[Math.floor(Math.random()*hints.length)];
-        console.log(`${word.part}: ${word.definition} (${word.word})`);
+        const hint = hints[Math.floor(Math.random()*hints.length)];
+        dispatch({
+          type: constants.GET_HINT,
+          payload: hint
+        });
       } else {
-        console.log('Hints aren\'t available yet - try and work it out yourself!');
+        dispatch({
+          type: constants.HINTS_NOT_AVAILABlE,
+        });
       }
     };
   },
@@ -116,8 +121,12 @@ const GameActions = {
       let word = state.player.word.map(l => state.letters[l]).join('');
 
       channel.push('games:check_validity', { word })
-        .receive('ok', r => {
-          console.log(r.valid);
+        .receive('ok', ({ valid }) => {
+          dispatch({
+            type: valid
+                  ? constants.WORD_VALID
+                  : constants.WORD_INVALID
+          });
         });
     };
   }
