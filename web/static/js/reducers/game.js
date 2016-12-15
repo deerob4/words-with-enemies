@@ -38,7 +38,7 @@ const message = (state = 'Go on friend, you can do it!', action) => {
   switch (action.type) {
     case constants.GET_HINT:
       const hint = action.payload;
-      return `Hint: ${`${hint.definition} (${hint.word})`}`;
+      return `Hint: ${hint.definition} (${hint.word})`;
 
     case constants.HINTS_NOT_AVAILABlE:
       return 'Hints aren\'t available yet - try and work it out yourself!';
