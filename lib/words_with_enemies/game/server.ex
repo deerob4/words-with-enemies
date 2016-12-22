@@ -1,6 +1,6 @@
 defmodule WordsWithEnemies.Game.Server do
   @moduledoc """
-  A process for controlling every individual game.
+  A process for controlling an individual game.
   """
 
   use GenServer
