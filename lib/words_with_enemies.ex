@@ -10,7 +10,8 @@ defmodule WordsWithEnemies do
       # Start the endpoint when the application starts
       supervisor(WordsWithEnemies.Endpoint, []),
       supervisor(WordsWithEnemies.Presence, []),
-      worker(WordsWithEnemies.GameRegistry, []),
+      supervisor(WordsWithEnemies.Game.Supervisor, []),
+      # worker(WordsWithEnemies.GameRegistry, []),
       worker(WordsWithEnemies.WordFinder, [])
       # Here you could define other workers and supervisors as children
       # worker(WordsWithEnemies.Worker, [arg1, arg2, arg3]),
