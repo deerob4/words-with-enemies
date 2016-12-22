@@ -4,7 +4,7 @@ defmodule WordsWithEnemies.Player do
   a player in a multiplayer game.
   """
 
-  alias WordsWithEnemies.{Player}
+  alias WordsWithEnemies.{Player, Letters}
 
   defstruct name: nil, score: 0, letters: []
 
@@ -23,25 +23,6 @@ defmodule WordsWithEnemies.Player do
   end
 
   @doc """
-  Adds `letter` to the list of letters in `player`. Letter must
-  be a string containing a single character between `a..z` or `A..Z`.
-  """
-  def add_letter(%Player{letters: letters} = player, letter) do
-    if valid_letter?(letter) do
-      Map.put(player, :letters, [letter | letters])
-    else
-      player
-    end
-  end
-
-  @doc """
-  Removes the first occurence of `letter` from `player`'s letters.
-  """
-  def remove_letter(%Player{letters: letters} = player, letter) do
-    Map.put(player, :letters, List.delete(letters, letter))
-  end
-
-  @doc """
   Replaces the letters for `player` with the new `letters`.
   `letters` should be a list of single character strings, each
   between between `a..z` or `A..Z`.
@@ -53,6 +34,21 @@ defmodule WordsWithEnemies.Player do
       player
     end
   end
+
+  @doc """
+  Replaces the player's letters with a randomly generated set.
+  `difficulty` can be either `"easy"` (default), `"medium"`, or
+  `"hard"`, depending on the game mode.
+  """
+  def set_random_letters(%Player{} = player, difficulty \\ "easy") do
+    set_letters(player, Letters.generate_set(:player, difficulty))
+  end
+
+  @doc """
+  Returns `true` if `player` is a `%Player{}` struct, otherwise false.`
+  """
+  def player?(%Player{}),   do: true
+  def player?(_not_player), do: false
 
   defp valid_letter?(letter) do
     ?a..?z
