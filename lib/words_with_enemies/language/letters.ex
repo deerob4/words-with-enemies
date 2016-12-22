@@ -35,7 +35,7 @@ defmodule WordsWithEnemies.Letters do
     frequencies(%{high: 3, med: 3, low: 4, pairs: 1}) # 8
   end
   def generate_set(:ai, "easy") do
-    frequencies(%{high: 3, med: 5, low: 4, pairs: 0}) # 12
+    frequencies(%{high: 3, med: 3, low: 4, pairs: 1}) # 12
   end
   def generate_set(:ai, "medium") do
     frequencies(%{high: 5, med: 4, low: 4, pairs: 1}) # 15
@@ -128,5 +128,3 @@ defmodule WordsWithEnemies.Letters do
     end)
   end
 end
-
-['cauliflower', 'smoked streaky bacon', 'chestnut mushrooms', 'milk', 'double cream']
