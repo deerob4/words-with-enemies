@@ -6,7 +6,12 @@ defmodule WordsWithEnemies.Player do
 
   alias WordsWithEnemies.{Player, Letters}
 
-  defstruct name: nil, score: 0, letters: []
+  defstruct id: nil, name: nil, score: 0, letters: []
+
+  @letters ?a..?z
+    |> Enum.concat(?A..?Z)
+    |> List.to_string()
+    |> String.codepoints()
 
   @doc """
   Returns `player` with the `score` key incremented by 1.
@@ -50,12 +55,5 @@ defmodule WordsWithEnemies.Player do
   def player?(%Player{}),   do: true
   def player?(_not_player), do: false
 
-  defp valid_letter?(letter) do
-    ?a..?z
-    |> Enum.concat(?A..?Z)
-    |> Enum.to_list
-    |> List.to_string
-    |> String.codepoints
-    |> Enum.member?(letter)
-  end
+  defp valid_letter?(letter), do: letter in @letters
 end
