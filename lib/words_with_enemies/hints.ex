@@ -7,9 +7,6 @@ defmodule WordsWithEnemies.Hints do
 
   @mashape_key "dZbkJBM2PJmshW7Kx3dtM2IIHbeLp1KcMDwjsnVONurSIqp4RW"
 
-  import WordsWithEnemies.WordFinder
-  import WordsWithEnemies.Endpoint, only: [broadcast!: 3]
-
   @doc """
   Returns the definitions of up to ten words
   that can be made using `letters`.
