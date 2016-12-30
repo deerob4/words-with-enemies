@@ -17,6 +17,9 @@ const bank = (state = [], action) => {
     case constants.CHANGE_LETTERS:
       return action.payload.letters.map((l, i) => i);
 
+    case constants.BEGIN_MULTIPLAYER_GAME:
+      return action.payload.playerLetters;
+
     case constants.ADD_LETTER:
       return [...state, action.payload.id];
 

@@ -1,10 +1,11 @@
 import * as constants from 'constants';
+import GameActions from 'actions/GameActions';
 import { browserHistory } from 'react-router';
 
 const Phoenix = require('../phoenix');
 const Presence = Phoenix.Presence;
 
-const Actions = {
+const LobbyActions = {
   connectToLobby(socket) {
     return (dispatch, getState) => {
       const lobby = socket.channel('games:lobby');
@@ -15,37 +16,41 @@ const Actions = {
           payload: lobby
         });
 
-        dispatch(Actions.fetchGames(lobby));
+        dispatch(LobbyActions.fetchGames(lobby));
       });
 
-      lobby.on('presence_state', state => {
-        const presences = getState().lobby.presences;
+      // Keeps track of the # of online users.
+
+      lobby.on('player_presence_state', state => {
+        const players = getState().lobby.players;
 
         dispatch({
-          type: constants.INITIALISE_PRESENCE_STATE,
-          payload: Presence.syncState(presences, state)
+          type: constants.INITIALISE_PLAYER_PRESENCE_STATE,
+          payload: Presence.syncState(players, state)
         });
       });
 
       lobby.on('presence_diff', diff => {
-        const presences = getState().lobby.presences;
+        const players = getState().lobby.players;
 
         dispatch({
-          type: constants.RECEIVE_PRESENCE_DIFF,
-          payload: Presence.syncDiff(presences, diff)
+          type: constants.PLAYER_DIFF,
+          payload: Presence.syncDiff(players, diff)
         });
       });
 
-      lobby.on('add_game', (r) => {
+      // Keeps track of the games that are available to join.
+
+      lobby.on('add_game', game => {
         dispatch({
-          type: constants.RECEIVE_JOINABLE_GAME,
-          payload: r.game
+          type: constants.ADD_LOBBY_GAME,
+          payload: game
         });
       });
 
-      lobby.on('remove_game', (r) => {
+      lobby.on('remove_game', r => {
         dispatch({
-          type: constants.REMOVE_JOINABLE_GAME,
+          type: constants.REMOVE_LOBBY_GAME,
           payload: r.id
         });
       });
@@ -63,9 +68,9 @@ const Actions = {
   fetchGames(lobby) {
     return dispatch => {
       lobby.push('games:fetch')
-        .receive('ok', (r) => {
+        .receive('ok', r => {
           dispatch({
-            type: constants.FETCH_AVAILABLE_GAMES,
+            type: constants.FETCH_LOBBY_GAMES,
             payload: r.games
           });
         });
@@ -75,39 +80,50 @@ const Actions = {
   hostGame(lobby, hostName) {
     return (dispatch, getState) => {
       const params = {
-        host_name: hostName,
-        host_id: getState().sessions.userId
+        name: hostName,
       };
-
-      console.log(hostName);
 
       lobby.push('games:create', params)
         .receive('ok', (r) => {
+          const socket = getState().sessions.socket;
+
           dispatch({
             type: constants.HOST_GAME,
             payload: r.id
           });
+
+          dispatch(GameActions.connectToGame(socket, r.id));
+        });
+    };
+  },
+
+  joinGame(lobby, id) {
+    return (dispatch, getState) => {
+      // Create initial contact with the game
+      lobby.push('games:connect', { id, name: 'theunlawfultruth' })
+        .receive('ok', r => {
+          const socket = getState().sessions.socket;
+          // Connect to the actual game channel. Future
+          // actions are in GameActions.
+          dispatch(GameActions.connectToGame(socket, id));
         });
     };
   },
 
   cancelHosting(lobby, id) {
-    return dispatch => {
+    return (dispatch, getState) => {
       lobby.push('games:delete', { id })
         .receive('ok', (r) => {
+          const gameChannel = getState().sessions.gameChannel;
+
           dispatch({
             type: constants.CANCEL_HOSTING,
           });
+
+          dispatch(GameActions.leaveGame(gameChannel, id));
         });
     };
   },
-
-  joinGame(lobby, gameId) {
-    return {
-      type: constants.JOIN_GAME,
-      payload: gameId
-    };
-  }
 };
 
-export default Actions;
+export default LobbyActions;

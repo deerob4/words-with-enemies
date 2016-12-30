@@ -5,6 +5,7 @@ defmodule WordsWithEnemies.Game.Server do
 
   use GenServer
   require Logger
+  alias WordsWithEnemies.Game.Lobby
   alias WordsWithEnemies.{Game, Player}
 
   @doc """
@@ -13,7 +14,8 @@ defmodule WordsWithEnemies.Game.Server do
   def start_link(id, players) when is_list(players) do
     if Enum.all?(players, &Player.player?/1) do
       game = %Game{id: id, players: players}
-      GenServer.start_link(__MODULE__, game, name: {:global, id})
+      name = {:via, Registry, {WordsWithEnemies.Game.Registry, id}}
+      GenServer.start_link(__MODULE__, game, name: name)
     else
       raise("invalid players passed")
     end
@@ -67,8 +69,8 @@ defmodule WordsWithEnemies.Game.Server do
   that player's struct with the result. Returns `:player_not_found`
   if the player doesn't exist.
   """
-  def update_player(pid, name, func) when is_function(func) do
-    GenServer.cast(pid, {:update_player, name, func})
+  def update_player(pid, id, func) when is_function(func) do
+    GenServer.cast(pid, {:update_player, id, func})
   end
 
   @doc """
@@ -92,17 +94,31 @@ defmodule WordsWithEnemies.Game.Server do
   end
 
   @doc """
-  Returns the struct of the game.
+  Returns the inner struct of the game.
   """
   def lookup(pid) do
     GenServer.call(pid, :lookup)
   end
 
+  @doc """
+  Terminates the game.
+  """
+  def stop(pid) do
+    GenServer.stop(pid)
+  end
+
   # Server
 
   def init(%Game{id: id} = game) do
-    Logger.info("Game:#{id} has been created")
+    Logger.info("Game:#{id} has initialised")
+    Lobby.add_game(game)
     {:ok, game}
+  end
+
+  def terminate(:normal, %Game{id: id} = game) do
+    Logger.info("Game:#{id} has terminated")
+    Lobby.remove_game(id)
+    :normal
   end
 
   def handle_call(:lookup, _from, game) do
@@ -116,6 +132,7 @@ defmodule WordsWithEnemies.Game.Server do
 
   def handle_cast(:begin_game, game) do
     Logger.info("Game:#{game.id} has started")
+    Lobby.remove_game(game.id)
     {:noreply, %{game | status: :in_progress}}
   end
 
@@ -124,6 +141,7 @@ defmodule WordsWithEnemies.Game.Server do
   end
 
   def handle_cast({:add_player, player}, game) do
+    Logger.info("#{player.name} was added to game:#{game.id}")
     {:noreply, %{game | players: [player | game.players]}}
   end
 
@@ -137,8 +155,8 @@ defmodule WordsWithEnemies.Game.Server do
     {:noreply, %{game | players: new_players}}
   end
 
-  def handle_cast({:update_player, name, func}, %Game{players: players} = game) do
-    index = Enum.find_index(players, &(&1.name == name)) || length(players)
+  def handle_cast({:update_player, id, func}, %Game{players: players} = game) do
+    index = Enum.find_index(players, &(&1.id == id)) || length(players)
     new_players = List.update_at(players, index, &func.(&1))
     {:noreply, %{game | players: new_players}}
   end

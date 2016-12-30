@@ -1,17 +1,37 @@
 import values from 'lodash/values';
+import { findKey } from 'lodash';
 import * as constants from '../constants';
 import nextId from 'utils/nextId';
 import { generateColours, letterColours } from 'utils/generateColours';
 
 const GameActions = {
-  connectToGame(socket, gameId, params = {}) {
-    return dispatch => {
-      const channel = socket.channel(`games:${gameId}`, params);
+  connectToGame(socket, gameId) {
+    return (dispatch, getState) => {
+      const channel = socket.channel(`games:${gameId}`);
+      const userId = getState().sessions.userId;
 
-      channel.join().receive('ok', () => {
+      channel.join()
+        .receive('ok', () => {
+          dispatch({
+            type: constants.CONNECT_TO_GAME,
+            payload: channel
+          });
+        })
+        .receive('error', r => {
+          dispatch({
+            type: constants.CONNECT_TO_GAME_FAILURE,
+            payload: r.reason
+          });
+        });
+
+      channel.on('begin_game', (r) => {
         dispatch({
-          type: constants.CONNECT_TO_GAME,
-          payload: channel
+          type: constants.BEGIN_MULTIPLAYER_GAME,
+          payload: {
+            colours: Object.keys(r.indexedLetters).map(x => letterColours()),
+            letters: r.indexedLetters,
+            playerLetters: r.playerLetters[userId]
+          }
         });
       });
 
@@ -124,16 +144,73 @@ const GameActions = {
   checkValidity(channel) {
     return (dispatch, getState) => {
       const state = getState();
-      let word = state.player.word.map(l => state.letters[l]).join('');
+      const letters = state.player.word;
 
-      channel.push('games:check_validity', { word })
-        .receive('ok', ({ valid }) => {
-          dispatch({
-            type: valid
-                  ? constants.WORD_VALID
-                  : constants.WORD_INVALID
+      if (!letters.length) {
+        dispatch(GameActions.wordInvalid());
+      } else {
+        let word = letters.map(l => state.letters[l]).join('');
+
+        channel.push('games:check_validity', { word })
+          .receive('ok', ({ valid }) => {
+            if (valid) {
+              dispatch({ type: constants.WORD_VALID });
+              dispatch(GameActions.computerTurn(channel, word));
+            } else {
+              dispatch(GameActions.wordInvalid());
+            }
           });
+      }
+
+    };
+  },
+
+  wordInvalid() {
+    return dispatch => {
+      dispatch({
+        type: constants.WORD_INVALID
+      });
+
+      setTimeout(() => {
+        dispatch({
+          type: constants.END_CHECKING
         });
+      }, 900);
+    };
+  },
+
+  computerTurn(channel, userWord) {
+    return (dispatch, getState) => {
+      dispatch({ type: constants.COMPUTER_THINKING });
+
+      const params = {
+        difficulty: getState().game.difficulty,
+        user_word: userWord
+      };
+
+      channel.push('games:generate_word', params)
+        .receive('ok', r => {
+          dispatch(GameActions.setOpponentWord(r.word));
+        });
+    };
+  },
+
+  setOpponentWord(word) {
+    return (dispatch, getState) => {
+      const letters = word.split('');
+      // Letters are stored in an object, keyed by an incrementing
+      // integer. Here we get the highest key, so all the new letter IDs
+      // can start at the correct place.
+      const idBase = Object.keys(getState().letters).length;
+
+      dispatch({
+        type: constants.SET_OPPONENT_WORD,
+        payload: letters.map((value, i) => ({
+          id: i+idBase,
+          value,
+          colours: letterColours()
+        }))
+      });
     };
   }
 };

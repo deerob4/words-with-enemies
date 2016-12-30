@@ -4,8 +4,14 @@ defmodule WordsWithEnemies.GameChannel do
   """
 
   use WordsWithEnemies.Web, :channel
+
   import WordsWithEnemies.WordFinder, only: [word_list: 0, using: 2]
-  alias WordsWithEnemies.{Letters, WordFinder, GameRegistry, GameServer, Hints}
+
+  alias WordsWithEnemies.{Game, Letters, WordFinder, Hints, Player}
+  alias WordsWithEnemies.Game.Registry, as: GameRegistry
+  alias WordsWithEnemies.Game.Server, as: GameServer
+
+  @minimum_players 2
 
   @doc """
   Connect to a standard single player game.
@@ -15,19 +21,32 @@ defmodule WordsWithEnemies.GameChannel do
   end
 
   @doc """
-  Connect to an available multiplayer game from the lobby.
+  Connect to the multiplayer game. The player will already
+  be a member if they've joined the game through the lobby.
   """
-  def join("games" <> game_id, %{"opponent" => %{"id" => _id, "name" => _name}}, socket) do
-    {:ok, assign(socket, :game_id, game_id)}
+  def join("games:" <> game_id, _payload, socket) do
+    game_id = String.to_integer(game_id)
+    user_id = socket.assigns.user_id
+
+    if can_join?(game_id, user_id) do
+      send(self(), {:begin_game?, game_id})
+      {:ok, socket}
+    else
+      {:error, %{reason: "unauthorised"}}
+    end
   end
 
-  @doc """
-  Create a new multiplayer game and connect to it.
-  """
-  def join("games" <> game_id, %{"host" => %{"id" => _id, "name" => _name} = params}, socket) do
-    send(self(), {:create_game, params})
-    {:ok, assign(socket, :game_id, game_id)}
+  def can_join?(game_id, player_id) do
+    case GameRegistry.lookup(game_id) do
+      {:ok, pid} ->
+        %Game{players: players} = GameServer.lookup(pid)
+        Enum.any?(players, &(&1.id === player_id))
+
+      {:error, _reason} ->
+        false
+    end
   end
+
 
   @doc """
   Sends the initial set of letters, and hints for words that can
@@ -122,6 +141,76 @@ defmodule WordsWithEnemies.GameChannel do
     end
   end
 
+  def handle_in("games:generate_word", %{"difficulty" => difficulty, "user_word" => user_word}, socket) do
+    letters = Letters.generate_set(:ai, difficulty)
+    word = word_list |> using(letters) |> Enum.random
+    {:reply, {:ok, %{word: word}}, socket}
+  end
+
+  @doc """
+
+  """
+  def handle_info({:begin_game?, game_id}, socket) do
+    {:ok, pid} = GameRegistry.lookup(game_id)
+    %Game{players: players} = GameServer.lookup(pid)
+
+    if length(players) >= @minimum_players do
+      GameServer.begin_game(pid)
+      GameServer.distribute_letters(pid)
+      %Game{players: players} = GameServer.lookup(pid)
+
+      letter_indexes = map_letters_to_index(players)
+
+      letters = %{
+        indexedLetters: letter_indexes |> key_by_index |> keys_to_string,
+        playerLetters: build_key_list(players, key_by_letter(letter_indexes), %{})
+      }
+
+      broadcast(socket, "begin_game", letters)
+    end
+
+    {:noreply, socket}
+  end
+
+  defp map_letters_to_index(players) do
+    players
+    |> Enum.map(fn(%Player{letters: letters}) -> letters end)
+    |> List.flatten()
+    |> Enum.with_index()
+  end
+
+  defp key_by_index(letters) do
+    Enum.reduce(letters, %{}, fn({letter, index}, letters) ->
+      Map.put(letters, index, letter)
+    end)
+  end
+
+  defp key_by_letter(letters) do
+    Enum.reduce(letters, %{}, fn({letter, index}, letters) ->
+      Map.update(letters, letter, [index], &(&1 ++ [index]))
+    end)
+  end
+
+  defp build_key_list([], _keys, results), do: results
+  defp build_key_list([%Player{id: id, letters: letters} | rest], keys, results) do
+    %{keys: keys, letter_keys: letter_keys} = do_build_key_list(letters, keys, [])
+    results = Map.put(results, to_string(id), letter_keys)
+    build_key_list(rest, keys, results)
+  end
+
+  defp do_build_key_list([], keys, letter_keys) do
+    %{keys: keys, letter_keys: letter_keys}
+  end
+  defp do_build_key_list([letter|rest], keys, letter_keys) do
+    [key | other_keys] = keys[letter]
+    keys = Map.put(keys, letter, other_keys)
+    do_build_key_list(rest, keys, letter_keys ++ [key])
+  end
+
+  defp keys_to_string(map) do
+    Map.new(map, fn({k, v}) -> {to_string(k), v} end)
+  end
+
   @doc """
   Sends hints for a set of letters to the client when they've
   been generated.
@@ -131,25 +220,7 @@ defmodule WordsWithEnemies.GameChannel do
     {:noreply, socket}
   end
 
-  @doc """
-  Creates a new game, and alerts someone. Probably. I should
-  look at this one again xD
-  """
-  def handle_info({:create_game, params}, socket) do
-    game =
-      %{host: %{name: params.name, id: params.id}}
-      |> GameRegistry.add_game
-      |> GameRegistry.get_pid
-      |> GameServer.get_state
-
-    broadcast_from(socket, "add_game", %{game: game})
-    {:noreply, socket}
-  end
-
-  defp valid_move?(letter_id, socket) do
-    pid = GameRegistry.get_pid(socket.assigns.id)
-    # Return true if all the validations return true.
-    with true <- GameServer.valid_letter?(pid, letter_id),
-    do: true
+  defp valid_move?(letter, socket) do
+    true
   end
 end
